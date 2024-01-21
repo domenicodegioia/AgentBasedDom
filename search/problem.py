@@ -289,3 +289,44 @@ class EightQueensProblem:
                 print('|', end='')
             print('\n', end='')
             print('\t_________________________________________________')
+
+
+class GridProblem:
+    """
+    Finding a path on a 2D grid with obstacles. Obstacles are (x, y) cells.
+    States:   (x, y) cell locations.
+    Actions:  (dx, dy) cell movements.
+    """
+
+    def __init__(self, initial_state, goal_state, environment):
+        self.initial_state = initial_state
+        self.goal_state = goal_state
+        self.environment = environment
+        self.directions = [
+            (-1, -1), (0, -1), (+1, -1),
+            (-1, 0),           (+1,  0),
+            (-1, +1), (0, +1), (+1, +1)
+        ]
+
+    def successors(self, state):
+        possible_actions = self.actions(state)
+        return [(self.result(state, a), a) for a in possible_actions]
+
+    def actions(self, state):
+        x, y = state
+        possible_actions = [(x+dx, y+dy) for (dx, dy) in self.directions]
+        possible_actions = set(possible_actions) - self.environment.obstacles
+        return possible_actions
+
+    def result(self, state=None, action=None):
+        return action if action not in self.environment.obstacles else state
+
+    def goal_test(self, state):
+        return state == self.goal_state
+
+    def cost(self, state, action):
+        new_state = self.result(state, action)
+        return self.environment.straight_line_distance(state, new_state)
+
+    def h(self, state):
+        return self.environment.straight_line_distance(state, self.goal_state)
