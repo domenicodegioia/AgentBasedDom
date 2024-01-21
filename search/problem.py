@@ -384,3 +384,37 @@ class PourProblem:
 
     def h(self, state):
         return self.environment.straight_line_distance(state, self.goal_state)
+
+
+class PancakeProblem:
+    """
+    Given a stack of pancakes of various sizes, can you sort them into a stack of decreasing sizes,
+    largest on bottom to smallest on top?
+    """
+
+    def __init__(self, initial_state, ):
+        self.initial_state = initial_state
+        self.goal_state = tuple(sorted(self.initial_state))
+
+    def successors(self, state):
+        possible_actions = self.actions(state)
+        return [(self.result(state, a), a) for a in possible_actions]
+
+    def actions(self, state):
+        return range(2, len(state) + 1)
+
+    def result(self, state=None, action=None):
+        new_state = list(state)
+        top_i = [new_state[i] for i in range(action)]
+        top_i.reverse()
+        new_state = [new_state[i] for i in range(action, len(new_state))]
+        return tuple(top_i + new_state)
+
+    def goal_test(self, state):
+        return state == self.goal_state
+
+    def cost(self, state, action):
+        return 1
+
+    def h(self, state):
+        return sum([state[i] == self.goal_state[i] for i in range(len(state))])
