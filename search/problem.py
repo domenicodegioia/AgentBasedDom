@@ -330,3 +330,57 @@ class GridProblem:
 
     def h(self, state):
         return self.environment.straight_line_distance(state, self.goal_state)
+
+
+class PourProblem:
+    """
+    Finding a path on a 2D grid with obstacles.
+    Obstacles are (x, y) cells.
+    States: a tuple of current water levels.
+    """
+
+    def __init__(self, initial_state, goal_state, sizes):
+        self.initial_state = initial_state
+        self.goal_state = goal_state
+        self.sizes = sizes
+
+    def successors(self, state):
+        possible_actions = self.actions(state)
+        return [(self.result(state, a), a) for a in possible_actions]
+
+    def actions(self, state):
+        possible_actions = []
+        jugs = range(len(state))
+        # (Fill, i): fill the ith jug all the way to the top (from a tap with unlimited water).
+        possible_actions.append([('Fill',i) for i in jugs if state[i]<self.sizes[i]])
+        # (Dump, i): dump all the water out of the ith jug.
+        possible_actions.append([('Dump', i) for i in jugs])
+        # (Pour, i, j): pour water from the ith jug into the jth jug until either the jug i is empty, or jug j is full,
+        # whichever comes first.
+        possible_actions.append([('Pour', i, j) for i in jugs if state[i] for j in jugs if i != j])
+        return list(possible_actions)
+
+    def result(self, state=None, action=None):
+        a, i, *_ = action
+        result = list(state)  # for initialization
+
+        if a == 'Fill':
+            result[i] = self.sizes[i]
+        elif a == 'Dump':
+            result[i] = 0
+        elif a == 'Pour':
+            j = action[2]
+            amount = min(state[i], self.sizes[j] - state[j])
+            result[i] -= amount
+            result[j] += amount
+        return tuple(result)
+
+    def goal_test(self, state):
+        return self.goal_state in state
+
+    def cost(self, state, action):
+        a, i, *_ = action
+        return (self.sizes[i] - state[i]) if a == 'Fill' else 0
+
+    def h(self, state):
+        return self.environment.straight_line_distance(state, self.goal_state)
