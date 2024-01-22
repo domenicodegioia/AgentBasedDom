@@ -13,7 +13,8 @@ search = HillClimbing(problem=problem)
 result, state = search.run()
 
 # display the solutions
-print(result)
-print(problem.value(state))
-print(state)
-problem.print_chess(state)
+print("Approach: " + search.__class__.__name__)
+print("Result: " + result)
+print("Value: " + str(problem.value(state)))
+print("State: " + str(state))
+# problem.print_chess(state)
