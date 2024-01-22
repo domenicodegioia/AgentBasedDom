@@ -3,6 +3,7 @@ from csp.backtracking import *
 from csp.ac3 import AC3
 from input.australia import *
 
+
 # Example 1
 print('Example 1')
 problem = CSP(variables=map_vars,
@@ -13,6 +14,7 @@ optimizer = AC3(csp=problem)
 optimizer.run(state)
 print(problem.domains)
 
+
 # Example 2
 print('Example 2')
 problem = CSP(variables=map_vars,
@@ -22,5 +24,5 @@ act_state = {'WA': 'red', 'Q': 'green'}
 problem.domains['WA'] = ['red']
 problem.domains['Q'] = ['green']
 optimizer = AC3(csp=problem)
-optimizer.run(state)
-print(problem.domains)
+print("Result: " + str(optimizer.run(state)))
+print("Domains: " + str(problem.domains))

@@ -1,7 +1,10 @@
-path = 'italian.txt'
+import os
+
+path = os.path.join(os.path.abspath('./'), 'input/italian.txt')
 
 words = []
-with open('/home/alberto/PycharmProjects/ABAI_HandsOn/input/italian.txt', 'r') as file:
+with open(path, 'r') as file:
     for word in file.readlines():
-        words.append(word.replace('\n', ''))
-
+        x = word.replace('\n', '')
+        x = x.lower()
+        words.append(x)

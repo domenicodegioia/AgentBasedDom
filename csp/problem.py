@@ -60,7 +60,7 @@ class CSP:
             return new_state
         raise ValueError
 
-    def legal_moves(self, state, variable):
+    def legal_assignments(self, state, variable):
         """
         Given a state and a variable returns the list of possible assignments
         @param state: a state
@@ -96,6 +96,11 @@ class CSP:
             return 0
 
     def assignable_variables(self, state):
+        """
+        Given a state of the problem return the list of the assignable variables
+        :param state: a problem state
+        :return: a list of variables
+        """
         return [variable for variable in self.variables if variable not in state]
 
     def remove_inconsistent_values(self, arc, actual_state):
