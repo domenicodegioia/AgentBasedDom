@@ -464,3 +464,10 @@ class JumpingFrogsProblem:
     def h(self, state):
         # amount of locations different from the goal state (hamming distance)
         return sum(c1 != c2 for c1, c2 in zip(state, self.goal_state))
+
+    def value(self, state):
+        r = sum([1 for i in range(len(state) // 2) if state[i] == 'R']) - sum(
+            [1 for i in range(len(state) // 2) if state[i] == 'L'])
+        l = sum([1 for i in range(len(state) // 2 + 1, len(state)) if state[i] == 'L']) - sum(
+            [1 for i in range(len(state) // 2 + 1, len(state)) if state[i] == 'R'])
+        return r + l
