@@ -418,3 +418,49 @@ class PancakeProblem:
 
     def h(self, state):
         return sum([state[i] == self.goal_state[i] for i in range(len(state))])
+
+
+class JumpingFrogsProblem:
+    """
+    Finding a path on a 2D grid with obstacles. Obstacles are (x, y) cells.
+    States:   (x, y) cell locations.
+    Actions:  (dx, dy) cell movements.
+    """
+
+    def __init__(self, N):
+        self.initial_state = N*'L' + '.' + N*'R'
+        self.goal_state = self.initial_state[::-1]
+
+
+    def successors(self, state):
+        possible_actions = self.actions(state)
+        return [(self.result(state, a), a) for a in possible_actions]
+
+    def actions(self, state):
+        possible_actions = []
+        for i in range(len(state)):
+            if state[i : i+2] == 'L.':  # Slide for L
+                possible_actions.append((i, i+1))
+            elif state[i : i+3] == 'LR.':  # Jump for L
+                possible_actions.append((i, i + 2))
+            elif state[i : i+2] == '.R':  # Slide for R
+                possible_actions.append((i+1, i))
+            elif state[i : i+3] == '.LR':  # Jump for R
+                possible_actions.append((i+2,i))
+        return possible_actions
+
+    def result(self, state=None, action=None):
+        i, j = action
+        result = list(state)
+        result[i], result[j] = state[j], state[i]
+        return ''.join(result)
+
+    def goal_test(self, state):
+        return state == self.goal_state
+
+    def cost(self, state, action):
+        return 1
+
+    def h(self, state):
+        # amount of locations different from the goal state (hamming distance)
+        return sum(c1 != c2 for c1, c2 in zip(state, self.goal_state))
