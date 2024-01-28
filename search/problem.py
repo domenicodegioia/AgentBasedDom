@@ -471,3 +471,42 @@ class JumpingFrogsProblem:
         l = sum([1 for i in range(len(state) // 2 + 1, len(state)) if state[i] == 'L']) - sum(
             [1 for i in range(len(state) // 2 + 1, len(state)) if state[i] == 'R'])
         return r + l
+
+
+class AustraliaProblem:
+    def __init__(self, initial_state, nodes, colors, map_adjacent_nodes):
+        self.initial_state = initial_state
+        self.nodes = nodes
+        self.colors = colors
+        self.map_adjacent_nodes = map_adjacent_nodes
+
+    def actions(self, state):
+        possible_actions = [(node, color) for node in self.nodes for color in self.colors]
+        random.shuffle(possible_actions)
+        return possible_actions
+
+    def result(self, state=None, action=None):
+        node, new_color = action
+        new_state = dict(state)
+        new_state[node] = new_color
+        return new_state
+
+    def successors(self, state):
+        possible_actions = self.actions(state)
+        return [(self.result(state, a), a) for a in possible_actions]
+
+    def conflicts(self, state):
+        conflicts = 0
+        for node in state.keys():
+            adjacent_nodes = [n for n in self.map_adjacent_nodes[node] if n in state.keys()]
+            conflicts += sum([1 for n in adjacent_nodes if state[node] == state[n]])
+        return conflicts / 2
+
+    def goal_test(self, state):
+        return len(state) == len(self.nodes) and self.conflicts(state) == 0
+
+    def cost(self, state, action):
+        return 1
+
+    def value(self, state):
+        return len(state) - self.conflicts(state)
