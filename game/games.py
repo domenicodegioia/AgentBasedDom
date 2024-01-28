@@ -1,3 +1,6 @@
+import random
+
+
 class Game:
     def __init__(self, initial_state, player):
         self.initial_state = initial_state
@@ -238,3 +241,95 @@ class JumpingFrogsGame(Game):
 
     def display_move(self, state: FrogState, move):
         print(self.player, f'--{move}--> ', state.board)
+
+
+class TTTState:
+    def __init__(self, board, to_move):
+        self.board = board
+        self.to_move = to_move
+
+    def __repr__(self):
+        # s = ''
+        # s.join('\t')
+        # s.join('\n___________________')
+        #
+        # for row in range(len(self.board)):
+        #     s.join('|')
+        #     for col in range(len(self.board)):
+        #         if self.board[row][col] == 1:
+        #             s.join('  X  ')
+        #         elif self.board[row][col] == -1:
+        #             s.join('  O  ')
+        #         else:
+        #             s.join('     ')
+        #         s.join('|')
+        #     s.join('\n')
+        #     s.join('___________________')
+        # return s
+        return str(self.board)
+
+
+class TicTacToe(Game):
+    def __init__(self, initial_state=None, player='MAX'):
+        if initial_state is None:
+            board = [[None] * 3] * 3  # external list --> row, internal lists -> col
+            initial_state = TTTState(board=board, to_move=1)
+        super(TicTacToe, self).__init__(initial_state, player)
+        self.initial_state = initial_state
+        self.player = player
+
+    def next_to_move(self, state: TTTState):
+        return -1 if state.to_move == 1 else 1
+
+    def actions(self, state: TTTState):
+        possible_actions = [(row, col)
+                            for row in range(len(state.board))
+                            for col in range(len(state.board[row]))
+                            if not state.board[row][col]]
+        random.shuffle(possible_actions)
+        return possible_actions
+
+    def result(self, state: TTTState, action):
+        row, col = action
+        new_board = [list(state.board[i]) for i in range(len(state.board))]
+        new_board[row][col] = state.to_move
+        return TTTState(board=new_board, to_move=self.next_to_move(state))
+
+    def check_winner(self, state: TTTState, player):
+        row = any([all([
+            state.board[i][j] == player
+             for j in range(len(state.board[i]))]
+            ) for i in range(len(state.board))
+        ])
+        col = any([all([
+            state.board[j][i] == player
+             for j in range(len(state.board[i]))]
+            ) for i in range(len(state.board))
+        ])
+        diag1 = any([all([
+            state.board[i][i] == player
+            for i in range(len(state.board))
+        ])])
+        diag2 = any([all([
+            state.board[i][len(state.board) - 1 - i] == player
+            for i in range(len(state.board))
+        ])])
+        return any([row, col, diag1, diag2])
+
+    def check_draw(self, state: TTTState):
+        return sum([1 for row in range(len(state.board)) for col in range(len(state.board[row]))
+                    if not state.board[row][col]]) == 0
+
+    def terminal_test(self, state: TTTState):
+        result_x = self.check_winner(state=state, player=1)
+        result_o = self.check_winner(state=state, player=-1)
+        draw = self.check_draw(state)
+        return any([result_x, result_o, draw])
+
+    def utility(self, state: TTTState):
+        if self.check_winner(state, 1):
+            return 1
+        if self.check_winner(state, -1):
+            return -1
+        if self.check_draw(state):
+            return 0
