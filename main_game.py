@@ -1,15 +1,14 @@
 from game.games import DummyGame
 from game.search import *
 
-game = DummyGame()
-first_player = Random(game=game)
-second_player = Minimax(game=game)
+dummy_game = DummyGame()
+first_player = Random(game=dummy_game)
+second_player = Minimax(game=dummy_game)
 
-state = game.initial_state
-moves = game.play(first_player, second_player)
-
-game = DummyGame()
-search = AlphaBeta(game=game)
+moves = dummy_game.play(first_player, second_player)
 
 
-print(search.next_move(game.initial_state))
+dummy_game = DummyGame()
+search = AlphaBeta(game=dummy_game)
+
+print(search.next_move(dummy_game.initial_state))
