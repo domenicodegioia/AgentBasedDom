@@ -1,4 +1,3 @@
-# let's build the skeleton of our game class
 class Game:
     def __init__(self, initial_state, player):
         self.initial_state = initial_state
@@ -101,7 +100,6 @@ class Game:
         print(self.player, f'--{move}--> ', state)
 
 
-# let's populate the skeleton with our dummy game
 class DummyGame(Game):
     def __init__(self, initial_state=None, player='MAX'):
         if initial_state is None:
@@ -182,3 +180,61 @@ class DummyGame(Game):
                    'D3': 2}
         return utility[state]
 
+
+class FrogState:
+    def __init__(self, board, to_move):
+        self.board = board
+        self.to_move = to_move
+
+
+class JumpingFrogsGame(Game):
+    def __init__(self, N, player='MAX'):
+        initial_state = N*'L' + '.' + N*'R'
+        super(JumpingFrogsGame, self).__init__(initial_state, player)
+        self.initial_state = FrogState(board=initial_state, to_move='L')
+        self.player = player
+
+    def actions(self, state: FrogState):
+        possible_actions = []
+
+        if state.to_move == 'L':
+            for i in range(len(state.board)):
+                if state.board[i: i + 2] == 'L.':  # Slide for L
+                    possible_actions.append((i, i + 1))
+                elif state.board[i: i + 3] == 'LR.':  # Jump for L
+                    possible_actions.append((i, i + 2))
+        else:
+            for i in range(len(state.board)):
+                if state.board[i: i + 2] == '.R':  # Slide for R
+                    possible_actions.append((i + 1, i))
+                elif state.board[i: i + 3] == '.LR':  # Jump for R
+                    possible_actions.append((i + 2, i))
+
+        return possible_actions
+
+    def result(self, state: FrogState, action):
+        i, j = action
+        result = list(state.board)
+        result[i], result[j] = state.board[j], state.board[i]
+        return FrogState(board=''.join(result), to_move=self.next_player())
+
+    def terminal_test(self, state: FrogState):
+        if state.board == self.initial_state.board[::-1]:
+            return True
+        else:
+            return False
+
+    def utility(self, state):
+        if self.terminal_test(state) and not self.successors(state):
+            if state.to_move == 'L':
+                return 1
+            else:
+                return -1
+        return 0
+
+    def display(self, state: FrogState):
+        print('_____________________')
+        print(self.player, 'in ', state.board)
+
+    def display_move(self, state: FrogState, move):
+        print(self.player, f'--{move}--> ', state.board)

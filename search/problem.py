@@ -446,7 +446,7 @@ class JumpingFrogsProblem:
             elif state[i : i+2] == '.R':  # Slide for R
                 possible_actions.append((i+1, i))
             elif state[i : i+3] == '.LR':  # Jump for R
-                possible_actions.append((i+2,i))
+                possible_actions.append((i+2, i))
         return possible_actions
 
     def result(self, state=None, action=None):
