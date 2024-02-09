@@ -1,5 +1,7 @@
 import random
 
+import numpy as np
+
 
 class Game:
     def __init__(self, initial_state, player):
@@ -333,3 +335,78 @@ class TicTacToe(Game):
             return -1
         if self.check_draw(state):
             return 0
+
+
+class Forza4State:
+    def __init__(self, board, to_move):
+        self.board = board
+        self.to_move = to_move
+
+class Forza4(Game):
+    def __init__(self, initial_state=None, player='MAX'):
+        if initial_state is None:
+            board = np.zeros((6, 7))
+            initial_state = Forza4State(board=board, to_move=1)
+        super(Forza4, self).__init__(initial_state, player)
+        self.initial_state = initial_state
+        self.player = player
+
+    def actions(self, state: Forza4State):
+        possible_actions = []
+
+        for j in range(state.board.shape[1]):
+            for i in range(state.board.shape[0]):
+                if not state.board[i, j] and state.board[i, j-1]:
+                    possible_actions.append((i, j))
+
+        return possible_actions
+
+    def result(self, state: Forza4State, action):
+        new_board = state.board.copy()
+        new_board[action] = state.to_move
+        return Forza4State(board=new_board, to_move=self.next_to_move(state))
+
+    def next_to_move(self, state: Forza4State):
+        return 1 if state.to_move == - 1 else - 1
+
+    def check_winner(self, state: Forza4State, player):
+        row = any([all([
+            state.board[i][j] == player
+             for j in range(len(state.board[i]))]
+            ) for i in range(len(state.board))
+        ])
+        col = any([all([
+            state.board[j][i] == player
+             for j in range(len(state.board[i])-1)]
+            ) for i in range(len(state.board))
+        ])
+        diag1 = any([all([
+            state.board[i][i] == player
+            for i in range(len(state.board))
+        ])])
+        diag2 = any([all([
+            state.board[i][len(state.board) - 1 - i] == player
+            for i in range(len(state.board))
+        ])])
+        return any([row, col, diag1, diag2])
+
+    def check_draw(self, state: Forza4State):
+        return sum([1 for row in range(len(state.board)) for col in range(len(state.board[row]))
+                    if not state.board[row][col]]) == 0
+
+    def terminal_test(self, state: Forza4State):
+        result_x = self.check_winner(state=state, player=1)
+        result_o = self.check_winner(state=state, player=-1)
+        draw = self.check_draw(state)
+        return any([result_x, result_o, draw])
+
+    def utility(self, state: Forza4State):
+        if self.check_winner(state, 1):
+            return 1
+        if self.check_winner(state, -1):
+            return -1
+        if self.check_draw(state):
+            return 0
+
+
+
