@@ -1,6 +1,8 @@
 import math
 import random
 
+import numpy as np
+
 
 class StreetProblem:
 
@@ -510,3 +512,72 @@ class AustraliaProblem:
 
     def value(self, state):
         return len(state) - self.conflicts(state)
+
+
+class VacuumState:
+    def __init__(self, env, vacuum_position):
+        self.env = env
+        self.vacuum_position = vacuum_position
+
+    def __repr__(self):
+        n = int(math.sqrt(len(self.env)))
+        return str(f'{np.array(self.env).reshape((n, n))}')
+
+class VacuumWorldProblem:
+    def __init__(self, initial_state, goal_state, vacuum_position):
+        self.initial_state = VacuumState(initial_state, vacuum_position)
+        self.goal_state = goal_state
+
+    def successors(self, state):
+        possible_actions = self.actions(state)
+        return [(self.result(state, a), a) for a in possible_actions]
+
+    def actions(self, state: VacuumState):
+        possible_actions = []
+        n = int(math.sqrt(len(state.env)))
+        row, col = state.vacuum_position
+        new_pos = row * n + col
+
+        # movement
+        if row > 0: possible_actions.append('Up')
+        if row < n - 1: possible_actions.append('Down')
+        if col < n - 1: possible_actions.append('Right')
+        if col > 0: possible_actions.append('Left')
+        # suck
+        if state.env[new_pos]: possible_actions.append('Suck')
+
+        return possible_actions
+
+    def result(self, state: VacuumState, action):
+        n = int(math.sqrt(len(state.env)))
+        row, col = state.vacuum_position
+        new_row = row
+        new_col = col
+        new_env = list(state.env)
+
+        # movement
+        if action == 'Up': new_row = row - 1
+        if action == 'Down': new_row = row + 1
+        if action == 'Left': new_col = col - 1
+        if action == 'Right': new_col = col + 1
+        # suck
+        if action == 'Suck':
+            new_pos = new_row * n + new_col
+            new_env[new_pos] = 0
+
+        return VacuumState(env=tuple(new_env), vacuum_position=tuple((new_row, new_col)))
+
+    def goal_test(self, state: VacuumState):
+        return state.env == self.goal_state
+
+    def cost(self, state: VacuumState, action):
+        return 1
+
+    def h(self, state: VacuumState):
+        # measure the number of dirty square
+        h = sum([1 for el in state.env if el == 1])
+        return h
+
+    def value(self, state: VacuumState):
+        # measure the number of clean square
+        pass
