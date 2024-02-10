@@ -30,29 +30,26 @@ class Cyx(Constraint):
 
 class Cxz(Constraint):
     def check(self, state):
-        def check(self, state):
-            if self.variables[0] in state and self.variables[1] in state:
-                return state[self.variables[0]] < state[self.variables[1]]
-            else:
-                return True
+        if self.variables[0] in state and self.variables[1] in state:
+            return state[self.variables[0]] < state[self.variables[1]]
+        else:
+            return True
 
 
 class Czx(Constraint):
     def check(self, state):
-        def check(self, state):
-            if self.variables[0] in state and self.variables[1] in state:
-                return state[self.variables[0]] > state[self.variables[1]]
-            else:
-                return True
+        if self.variables[0] in state and self.variables[1] in state:
+            return state[self.variables[0]] > state[self.variables[1]]
+        else:
+            return True
 
 
 class Ckz(Constraint):
     def check(self, state):
-        def check(self, state):
-            if self.variables[0] in state and self.variables[1] in state:
-                return state[self.variables[0]] == state[self.variables[1]]
-            else:
-                return True
+        if self.variables[0] in state and self.variables[1] in state:
+            return state[self.variables[0]] == state[self.variables[1]]
+        else:
+            return True
 
 
 constraints = [Cxy(['X', 'Y']), Cyx(['Y', 'X']), Cxz(['X', 'Z']), Czx(['Z', 'X']), Ckz(['K', 'Z'])]
